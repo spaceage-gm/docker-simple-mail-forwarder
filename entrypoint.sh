@@ -167,7 +167,7 @@ function start_postfix {
     postconf -e "mynetworks_style=subnet"
     
     # make sure that we know the trusted CA certificates
-    postconf -e "smtp_tls_cafile=/etc/ssl/certs/ca-certificates.crt"
+    postconf -e "smtp_tls_CAfile=/etc/ssl/certs/ca-certificates.crt"
     
     if [ ! -z "$RELAY_SERVER" ]; then
       if [ -z "$RELAY_PORT" ]; then
@@ -179,7 +179,7 @@ function start_postfix {
       
       postconf -e "relayhost=[$RELAY_SERVER]:$RELAY_PORT"
       if [ ! -z "$RELAY_USERNAME" ] && [ ! -z "$RELAY_PASSWORD" ]; then
-        echo "[$RELAY_SERVER]:$RELAY_PORT $RELAY_USERNAME:$RELAY_PASSWORD" >> /etc/postfix/sasl_passwd
+        echo "[$RELAY_SERVER]:$RELAY_PORT $RELAY_USERNAME:$RELAY_PASSWORD" > /etc/postfix/sasl_passwd
         postmap /etc/postfix/sasl_passwd
         
         postconf -e "smtp_sasl_auth_enable=yes"
