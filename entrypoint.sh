@@ -162,7 +162,10 @@ function start_postfix {
     postconf -e mydestination="localhost"
     echo "$HOSTNAME" > /etc/mailname
     echo "$HOSTNAME" > /etc/hostname
-
+    
+    # trust other containers that want to send email
+    postconf -e mynetworks_style=subnet
+    
     postfix start
 }
 
