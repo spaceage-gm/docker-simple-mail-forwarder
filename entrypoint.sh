@@ -166,6 +166,9 @@ function start_postfix {
     # trust other containers that want to send email
     postconf -e "mynetworks_style=subnet"
     
+    # make sure that we know the trusted CA certificates
+    postconf -e "smtp_tls_cafile=/etc/ssl/certs/ca-certificates.crt"
+    
     if [ ! -z "$RELAY_SERVER" ]; then
       if [ -z "$RELAY_PORT" ]; then
         RELAY_PORT=587
