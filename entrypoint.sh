@@ -164,7 +164,27 @@ function start_postfix {
     echo "$HOSTNAME" > /etc/hostname
     
     # trust other containers that want to send email
-    postconf -e mynetworks_style=subnet
+    postconf -e "mynetworks_style=subnet"
+    
+    if [ ! -z "$RELAY_SERVER" ]; then
+      if [ -z "$RELAY_PORT" ]; then
+        RELAY_PORT=587
+      fi
+      if [ "$RELAY_SECURE_TLS" != "false" ]; then
+        postconf -e "smtp_tls_security_level=secure"
+      fi
+      
+      postconf -e "relayhost=[$RELAY_SERVER]:$RELAY_PORT"
+      if [ ! -z "$RELAY_USERNAME" ] && [ ! -z "$RELAY_PASSWORD" ]; then
+        echo "[$RELAY_SERVER]:$RELAY_PORT $RELAY_USERNAME:$RELAY_PASSWORD" >> /etc/postfix/sasl_passwd
+        postmap /etc/postfix/sasl_passwd
+        
+        postconf -e "smtp_sasl_auth_enable=yes"
+        postconf -e "smtp_sasl_security_options=noanonymous"
+        postconf -e "smtp_sasl_password_maps=hash:/etc/postfix/sasl_passwd"
+      fi
+    fi
+    # setup relay host
     
     postfix start
 }
